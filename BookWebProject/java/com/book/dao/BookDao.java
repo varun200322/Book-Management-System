@@ -1,59 +1,42 @@
 package com.book.dao;
 
+import java.util.List;
+
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.SharedSessionContract;
-import org.hibernate.query.QueryProducer;
-import org.hibernate.query.SelectionQuery;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import com.book.entity.Book;
 import com.book.utility.HibernateUtil;
-import com.mysql.cj.Session;
 
-import java.util.List;
-import jakarta.transaction.HeuristicMixedException;
-import jakarta.transaction.HeuristicRollbackException;
-import jakarta.transaction.RollbackException;
-import jakarta.transaction.SystemException;
-import jakarta.transaction.Transaction;
-
-public class BookDao 
+public class BookDao
 {
-	public static void saveBook(Book book)
-	{
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = (Session) sessionFactory.openSession();
-		Transaction tx = (Transaction) ((SharedSessionContract) session).beginTransaction();
-		((org.hibernate.Session) session).persist(book);
-		try {
-			tx.commit();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (RollbackException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (HeuristicMixedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (HeuristicRollbackException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		session.forceClose();
-	}
-	public static List<Book> listBook()
-	{
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = (Session) sessionFactory.openSession();
-		SelectionQuery<Book> query = ((QueryProducer) session).createSelectionQuery("from Book", Book.class);
-		List<Book> bookList = query.list();
-		return bookList;
-		
-	}
+    public static void saveBook(Book book)
+    {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+
+        if (sessionFactory == null)
+        {
+            throw new RuntimeException("SessionFactory is NULL. Check HibernateUtil.");
+        }
+
+        Session session = sessionFactory.openSession();
+        Transaction tx = session.beginTransaction();
+
+        session.persist(book);
+
+        tx.commit();
+        session.close();
+    }
+
+    public static List<Book> listBook()
+    {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+        Query<Book> query = session.createQuery("from Book", Book.class);
+        List<Book> bookList = query.list();
+        session.close();
+        return bookList;
+    }
 }

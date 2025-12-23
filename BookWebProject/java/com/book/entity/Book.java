@@ -4,12 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
-public class Book 
+public class Book
 {
 	@Id
 	private int bookId;
 	private String bookName;
 	private int bookPrice;
+	public Book() {}
 	public int getBookId() {
 		return bookId;
 	}
@@ -28,5 +29,5 @@ public class Book
 	public void setBookPrice(int bookPrice) {
 		this.bookPrice = bookPrice;
 	}
-	
+
 }
